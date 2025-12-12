@@ -8,12 +8,10 @@ The client generation process uses TypeSpec emitters to generate clients directl
 
 ## Available TypeSpec Emitters
 
-- `@azure-tools/typespec-ts` - TypeScript (RLC)
-- `@typespec/http-client-python` - Python
-- `@azure-tools/typespec-go` - Go
-- `@azure-tools/typespec-java` - Java
-- `@azure-tools/typespec-csharp` - C#
-- `@azure-tools/typespec-rust` - Rust
+- `@typespec/http-client-js` - TypeScript/JavaScript
+- `@typespec/http-client-python` - Python  
+- `@typespec/http-client-csharp` - C#
+- `@typespec/http-client-java` - Java
 
 ## Steps to Add a New Language
 
@@ -28,22 +26,22 @@ yarn add @typespec/http-client-python
 
 ### 2. Configure the Emitter
 
-Edit `typespec/tspconfig.yaml` to add the emitter:
+Edit `typespec/tspconfig.yaml` to add the emitter to the emit array and configure options:
 
 ```yaml
 emit:
-  - "@azure-tools/typespec-ts"
+  - "@typespec/http-client-js"
   - "@typespec/http-client-python"
+
 options:
-  "@azure-tools/typespec-ts":
+  "@typespec/http-client-js":
     packageDetails:
       name: "@api-view/typescript-client"
       version: "1.0.0"
-    emitterOutputDir: "{project-root}/../packages/typescript-client"
   "@typespec/http-client-python":
-    package-name: "apiview-client"
-    package-version: "1.0.0"
-    emitterOutputDir: "{project-root}/../packages/python-client"
+    packageDetails:
+      name: "apiview-client"
+      version: "1.0.0"
 ```
 
 ### 3. Add Generation Script (Optional)
@@ -53,7 +51,7 @@ For convenience, add a script in `typespec/package.json`:
 ```json
 {
   "scripts": {
-    "generate:python": "tsp compile . --emit @typespec/http-client-python"
+    "generate:python": "tsp compile . --emit @typespec/http-client-python && mkdir -p ../packages && rm -rf ../packages/python-client && mv tsp-output/@typespec/http-client-python ../packages/python-client"
   }
 }
 ```
@@ -62,8 +60,6 @@ For convenience, add a script in `typespec/package.json`:
 
 ```bash
 yarn workspace @api-view/typespec generate:python
-# or
-cd typespec && tsp compile . --emit @typespec/http-client-python
 ```
 
 ### 5. Test the Generated Client
@@ -81,42 +77,56 @@ Add usage instructions to the main README.md.
 
 ## Emitter Configuration Examples
 
-### TypeScript
+All emitter options should be placed in the `tspconfig.yaml` file under the `options` section.
+
+### TypeScript/JavaScript
 
 ```yaml
-"@azure-tools/typespec-ts":
-  packageDetails:
-    name: "@api-view/typescript-client"
-    version: "1.0.0"
-  generateMetadata: true
-  generateTest: false
-  emitterOutputDir: "{project-root}/../packages/typescript-client"
+options:
+  "@typespec/http-client-js":
+    packageDetails:
+      name: "@api-view/typescript-client"
+      version: "1.0.0"
 ```
 
 ### Python
 
 ```yaml
-"@typespec/http-client-python":
-  package-name: "apiview-client"
-  package-version: "1.0.0"
-  emitterOutputDir: "{project-root}/../packages/python-client"
+options:
+  "@typespec/http-client-python":
+    packageDetails:
+      name: "apiview-client"
+      version: "1.0.0"
 ```
 
-### Go
+### C#
 
 ```yaml
-"@azure-tools/typespec-go":
-  module: "github.com/yourorg/apiview-client"
-  packageDir: "{project-root}/../packages/go-client"
+options:
+  "@typespec/http-client-csharp":
+    packageDetails:
+      name: "APIView.Client"
+      version: "1.0.0"
+```
+
+### Java
+
+```yaml
+options:
+  "@typespec/http-client-java":
+    packageDetails:
+      name: "com.apiview.client"
+      version: "1.0.0"
 ```
 
 ## Best Practices
 
-1. **Output Directory**: Generate to `packages/<language>-client/`
+1. **Output Directory**: Generated code goes to `tsp-output/@typespec/<emitter-name>/`, then move to `packages/<language>-client/`
 2. **Package Naming**: Use consistent naming conventions
 3. **Documentation**: Create usage examples for each client
 4. **Version**: Keep all clients at the same version as the TypeSpec
 5. **Testing**: Verify generated clients build and work correctly
+6. **Configuration**: Put all emitter configuration in `tspconfig.yaml` under the `options` section
 
 ## Example: Adding Python Client
 
@@ -129,21 +139,32 @@ yarn add @typespec/http-client-python
 2. Update `typespec/tspconfig.yaml`:
 ```yaml
 emit:
-  - "@azure-tools/typespec-ts"
+  - "@typespec/http-client-js"
   - "@typespec/http-client-python"
+
 options:
+  "@typespec/http-client-js":
+    packageDetails:
+      name: "@api-view/typescript-client"
+      version: "1.0.0"
   "@typespec/http-client-python":
-    package-name: "apiview-client"
-    package-version: "1.0.0"
-    emitterOutputDir: "{project-root}/../packages/python-client"
+    packageDetails:
+      name: "apiview-client"
+      version: "1.0.0"
 ```
 
 3. Generate:
 ```bash
-tsp compile . --emit @typespec/http-client-python
+tsp compile .
 ```
 
-4. Test:
+4. Move output:
+```bash
+mkdir -p ../packages
+mv tsp-output/@typespec/http-client-python ../packages/python-client
+```
+
+5. Test:
 ```bash
 cd ../packages/python-client
 pip install -e .
@@ -167,5 +188,5 @@ python -c "import apiview_client; print(apiview_client)"
 ## Resources
 
 - [TypeSpec Documentation](https://typespec.io/)
-- [Azure TypeSpec Emitters](https://github.com/Azure/autorest.typescript/tree/main/packages)
-- [TypeSpec HTTP Client Python](https://github.com/microsoft/typespec/tree/main/packages/http-client-python)
+- [TypeSpec HTTP Client Emitters](https://github.com/microsoft/typespec)
+- [TypeSpec Compiler Options](https://typespec.io/docs/handbook/configuration)
