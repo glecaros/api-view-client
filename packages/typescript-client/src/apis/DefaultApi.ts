@@ -16,20 +16,21 @@
 import * as runtime from '../runtime';
 import type {
   ErrorResponse,
+  UploadFormData,
   UploadResponse,
 } from '../models/index';
 import {
     ErrorResponseFromJSON,
     ErrorResponseToJSON,
+    UploadFormDataFromJSON,
+    UploadFormDataToJSON,
     UploadResponseFromJSON,
     UploadResponseToJSON,
 } from '../models/index';
 
 export interface AutoReviewUploadAutoReviewRequest {
     apiKey: string;
-    file: Blob;
-    label: string;
-    packageVersion: string;
+    uploadFormData: UploadFormData;
 }
 
 /**
@@ -48,24 +49,10 @@ export class DefaultApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['file'] == null) {
+        if (requestParameters['uploadFormData'] == null) {
             throw new runtime.RequiredError(
-                'file',
-                'Required parameter "file" was null or undefined when calling autoReviewUploadAutoReview().'
-            );
-        }
-
-        if (requestParameters['label'] == null) {
-            throw new runtime.RequiredError(
-                'label',
-                'Required parameter "label" was null or undefined when calling autoReviewUploadAutoReview().'
-            );
-        }
-
-        if (requestParameters['packageVersion'] == null) {
-            throw new runtime.RequiredError(
-                'packageVersion',
-                'Required parameter "packageVersion" was null or undefined when calling autoReviewUploadAutoReview().'
+                'uploadFormData',
+                'Required parameter "uploadFormData" was null or undefined when calling autoReviewUploadAutoReview().'
             );
         }
 
@@ -73,36 +60,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        headerParameters['Content-Type'] = 'application/json';
+
         if (requestParameters['apiKey'] != null) {
             headerParameters['api-key'] = String(requestParameters['apiKey']);
-        }
-
-        const consumes: runtime.Consume[] = [
-            { contentType: 'multipart/form-data' },
-        ];
-        // @ts-ignore: canConsumeForm may be unused
-        const canConsumeForm = runtime.canConsumeForm(consumes);
-
-        let formParams: { append(param: string, value: any): any };
-        let useForm = false;
-        // use FormData to transmit files using content-type "multipart/form-data"
-        useForm = canConsumeForm;
-        if (useForm) {
-            formParams = new FormData();
-        } else {
-            formParams = new URLSearchParams();
-        }
-
-        if (requestParameters['file'] != null) {
-            formParams.append('file', requestParameters['file'] as any);
-        }
-
-        if (requestParameters['label'] != null) {
-            formParams.append('label', requestParameters['label'] as any);
-        }
-
-        if (requestParameters['packageVersion'] != null) {
-            formParams.append('packageVersion', requestParameters['packageVersion'] as any);
         }
 
 
@@ -113,7 +74,7 @@ export class DefaultApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: formParams,
+            body: UploadFormDataToJSON(requestParameters['uploadFormData']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => UploadResponseFromJSON(jsonValue));

@@ -53,9 +53,6 @@ interface AutoReview {
         /** API Key for authentication */
         @header ApiKey: string,
 
-        /** Form data containing file and metadata */
-        @header contentType: "multipart/form-data",
-
         @multipartBody body: UploadFormData,
     ): UploadResponse | ErrorResponse;
 }
