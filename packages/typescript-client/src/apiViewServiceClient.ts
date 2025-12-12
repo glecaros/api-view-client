@@ -1,30 +1,29 @@
-// Licensed under the MIT License.
+import { type ApiViewServiceClientContext, type ApiViewServiceClientOptions, createApiViewServiceClientContext } from "./api/apiViewServiceClientContext.js";
+import { type AutoReviewClientContext, type AutoReviewClientOptions, createAutoReviewClientContext } from "./api/autoReviewClient/autoReviewClientContext.js";
+import { uploadAutoReview, type UploadAutoReviewOptions } from "./api/autoReviewClient/autoReviewClientOperations.js";
+import type { UploadFormData } from "./models/models.js";
 
-import {
-  createAPIViewService,
-  APIViewServiceContext,
-  APIViewServiceClientOptionalParams,
-} from "./api/index.js";
-import { AutoReviewOperations, _getAutoReviewOperations } from "./classic/autoReview/index.js";
-import { Pipeline } from "@typespec/ts-http-runtime";
-
-export { APIViewServiceClientOptionalParams } from "./api/apiViewServiceContext.js";
-
-export class APIViewServiceClient {
-  private _client: APIViewServiceContext;
-  /** The pipeline used by this client to make requests */
-  public readonly pipeline: Pipeline;
-
-  constructor(options: APIViewServiceClientOptionalParams = {}) {
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createAPIViewService({ ...options, userAgentOptions: { userAgentPrefix } });
-    this.pipeline = this._client.pipeline;
-    this.autoReview = _getAutoReviewOperations(this._client);
+export class ApiViewServiceClient {
+  #context: ApiViewServiceClientContext
+  autoReviewClient: AutoReviewClient
+  constructor(options?: ApiViewServiceClientOptions) {
+    this.#context = createApiViewServiceClientContext(options);
+    this.autoReviewClient = new AutoReviewClient(options);
   }
 
-  /** The operation groups for autoReview */
-  public readonly autoReview: AutoReviewOperations;
+}
+export class AutoReviewClient {
+  #context: AutoReviewClientContext
+
+  constructor(options?: AutoReviewClientOptions) {
+    this.#context = createAutoReviewClientContext(options);
+
+  }
+  async uploadAutoReview(
+    apiKey: string,
+    body: UploadFormData,
+    options?: UploadAutoReviewOptions,
+  ) {
+    return uploadAutoReview(this.#context, apiKey, body, options);
+  }
 }

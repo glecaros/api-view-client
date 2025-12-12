@@ -1,6 +1,6 @@
 # TypeScript Client Usage
 
-This TypeScript client is generated from TypeSpec using the `@azure-tools/typespec-ts` emitter.
+This TypeScript client is generated from TypeSpec using the `@typespec/http-client-js` emitter.
 
 ## Installation
 
@@ -17,32 +17,27 @@ npm run build
 ## Basic Usage
 
 ```typescript
-import APIViewServiceClient, { isUnexpected } from "@api-view/typescript-client";
+import { ApiViewServiceClient } from "@api-view/typescript-client";
 
 // Create the client
-const client = APIViewServiceClient("https://apiview.dev");
+const client = new ApiViewServiceClient({
+  endpoint: "https://apiview.dev"
+});
 
 // Upload a file for auto review
 async function uploadForReview() {
   const file = new File(['/* your code content */'], 'code.ts', { type: 'text/plain' });
   
-  const result = await client.path("/AutoReview/UploadAutoReview").post({
-    headers: {
-      "api-key": "your-api-key-here",
-    },
-    contentType: "multipart/form-data",
-    body: {
+  const result = await client.autoReviewClient.uploadAutoReview(
+    "your-api-key-here",
+    {
       file: file,
       label: "v1.0.0",
       packageVersion: "1.0.0"
     }
-  });
+  );
   
-  if (isUnexpected(result)) {
-    throw new Error(`Upload failed: ${result.body.message}`);
-  }
-  
-  console.log('Upload response:', result.body.content);
+  console.log('Upload response:', result.content);
 }
 
 uploadForReview().catch(console.error);
@@ -52,9 +47,9 @@ uploadForReview().catch(console.error);
 
 The generated client provides:
 
-- **REST Level Client (RLC)**: Low-level, path-based API
+- **ApiViewServiceClient**: Main client class
+- **AutoReviewClient**: Sub-client for auto review operations
 - **Type Safety**: Full TypeScript types for requests and responses
-- **Multiple Module Formats**: ESM, CommonJS, Browser, React Native
 
 ## Models
 
@@ -72,10 +67,10 @@ The generated client provides:
 
 ## Client Features
 
-- **Modern TypeScript**: Built with TypeScript 5.8+
-- **Multi-Platform**: Works in Node.js, browsers, and React Native
-- **Tree-Shakeable**: ES modules support for optimal bundle sizes
+- **Modern TypeScript**: Built with ES modules
+- **Promise-based**: Async/await support
 - **Type Safe**: Complete TypeScript definitions
+- **Class-based**: Clean, object-oriented API
 
 ## Building
 
@@ -83,7 +78,12 @@ The generated client provides:
 npm run build
 ```
 
-This will:
-1. Clean previous builds
-2. Build with `tshy` for multiple module formats
-3. Extract API documentation
+This will compile the TypeScript code to JavaScript in the `dist/` directory.
+
+## Development
+
+The client is generated automatically from the TypeSpec definition. Do not manually edit the generated files. Instead:
+
+1. Make changes to `typespec/main.tsp`
+2. Run `yarn generate:typescript` from the repository root
+3. Rebuild the client with `npm run build`

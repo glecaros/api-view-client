@@ -1,10 +1,8 @@
 emit:
-  - "@azure-tools/typespec-ts"
+  - "@typespec/http-client-js"
+
 options:
-  "@azure-tools/typespec-ts":
+  "@typespec/http-client-js":
     packageDetails:
       name: "@api-view/typescript-client"
       version: "1.0.0"
-    generateMetadata: true
-    generateTest: false
-    emitterOutputDir: "{project-root}/../packages/typescript-client"

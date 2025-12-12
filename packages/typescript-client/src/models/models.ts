@@ -1,54 +1,102 @@
-// Licensed under the MIT License.
-
-import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
-
 /**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
+ * A sequence of textual characters.
  */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/** Upload form data for auto review using multipart/form-data */
+export type String = string;
+/**
+ * Upload form data for auto review using multipart/form-data
+ */
 export interface UploadFormData {
-  /** The file to upload as binary data */
-  file: FileContents | { contents: FileContents; contentType?: string; filename?: string };
-  /** The API version label */
+  /**
+   * The file to upload as binary data
+   */
+  file: File;
+  /**
+   * The API version label
+   */
   label: string;
-  /** The package version */
+  /**
+   * The package version
+   */
   packageVersion: string;
 }
-
-export function uploadFormDataSerializer(item: UploadFormData): any {
-  return [
-    createFilePartDescriptor("file", item["file"]),
-    { name: "label", body: item["label"] },
-    { name: "packageVersion", body: item["packageVersion"] },
-  ];
+/**
+ * A file in an HTTP request, response, or multipart payload.
+ *
+ * Files have a special meaning that the HTTP library understands. When the body of an HTTP request, response,
+ * or multipart payload is _effectively_ an instance of `TypeSpec.Http.File` or any type that extends it, the
+ * operation is treated as a file upload or download.
+ *
+ * When using file bodies, the fields of the file model are defined to come from particular locations by default:
+ *
+ * - `contentType`: The `Content-Type` header of the request, response, or multipart payload (CANNOT be overridden or changed).
+ * - `contents`: The body of the request, response, or multipart payload (CANNOT be overridden or changed).
+ * - `filename`: The `filename` parameter value of the `Content-Disposition` header of the response or multipart payload
+ * (MAY be overridden or changed).
+ *
+ * A File may be used as a normal structured JSON object in a request or response, if the request specifies an explicit
+ * `Content-Type` header. In this case, the entire File model is serialized as if it were any other model. In a JSON payload,
+ * it will have a structure like:
+ *
+ * ```
+ * {
+ *   "contentType": <string?>,
+ *   "filename": <string?>,
+ *   "contents": <string, base64>
+ * }
+ * ```
+ *
+ * The `contentType` _within_ the file defines what media types the data inside the file can be, but if the specification
+ * defines a `Content-Type` for the payload as HTTP metadata, that `Content-Type` metadata defines _how the file is
+ * serialized_. See the examples below for more information.
+ *
+ * NOTE: The `filename` and `contentType` fields are optional. Furthermore, the default location of `filename`
+ * (`Content-Disposition: <disposition>; filename=<filename>`) is only valid in HTTP responses and multipart payloads. If
+ * you wish to send the `filename` in a request, you must use HTTP metadata decorators to describe the location of the
+ * `filename` field. You can combine the metadata decorators with `@visibility` to control when the `filename` location
+ * is overridden, as shown in the examples below.
+ */
+export interface File {
+  /**
+   * The allowed media (MIME) types of the file contents.
+   *
+   * In file bodies, this value comes from the `Content-Type` header of the request or response. In JSON bodies,
+   * this value is serialized as a field in the response.
+   *
+   * NOTE: this is not _necessarily_ the same as the `Content-Type` header of the request or response, but
+   * it will be for file bodies. It may be different if the file is serialized as a JSON object. It always refers to the
+   * _contents_ of the file, and not necessarily the way the file itself is transmitted or serialized.
+   */
+  contentType?: string;
+  /**
+   * The name of the file, if any.
+   *
+   * In file bodies, this value comes from the `filename` parameter of the `Content-Disposition` header of the response
+   * or multipart payload. In JSON bodies, this value is serialized as a field in the response.
+   *
+   * NOTE: By default, `filename` cannot be sent in request payloads and can only be sent in responses and multipart
+   * payloads, as the `Content-Disposition` header is not valid in requests. If you want to send the `filename` in a request,
+   * you must extend the `File` model and override the `filename` property with a different location defined by HTTP metadata
+   * decorators.
+   */
+  filename?: string;
+  /**
+   * The contents of the file.
+   *
+   * In file bodies, this value comes from the body of the request, response, or multipart payload. In JSON bodies,
+   * this value is serialized as a field in the response.
+   */
+  contents: Uint8Array;
 }
-
-/** Response from uploading an auto review */
+/**
+ * Represent a byte array
+ */
+export type Bytes = Uint8Array;
+/**
+ * Response from uploading an auto review
+ */
 export interface UploadResponse {
-  /** The response content from the upload operation */
+  /**
+   * The response content from the upload operation
+   */
   content: string;
-}
-
-export function uploadResponseDeserializer(item: any): UploadResponse {
-  return {
-    content: item["content"],
-  };
-}
-
-/** Error response model */
-export interface ErrorResponse {
-  /** Error message */
-  message: string;
-  /** HTTP status code */
-  code: number;
-}
-
-export function errorResponseDeserializer(item: any): ErrorResponse {
-  return {
-    message: item["message"],
-    code: item["code"],
-  };
 }

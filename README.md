@@ -40,9 +40,7 @@ To generate a TypeScript client library directly from TypeSpec:
 yarn generate:typescript
 ```
 
-This uses the `@azure-tools/typespec-ts` emitter to generate a TypeScript client in `packages/typescript-client/`.
-
-**Note:** There's currently a known issue with the TypeSpec emitter where `contentType: contentType` is generated instead of `contentType: "multipart/form-data"` in the operations file. After generation, you'll need to manually fix this in `packages/typescript-client/src/api/autoReview/operations.ts` before building.
+This uses the `@typespec/http-client-js` emitter to generate a TypeScript client in `packages/typescript-client/`.
 
 ### Build All Packages
 
@@ -74,13 +72,13 @@ The API specification is defined in `typespec/main.tsp` and includes:
 
 Location: `packages/typescript-client/`
 
-The TypeScript client is generated directly from TypeSpec using the `@azure-tools/typespec-ts` emitter.
+The TypeScript client is generated directly from TypeSpec using the `@typespec/http-client-js` emitter.
 
 Features:
-- ES6+ support
+- Modern TypeScript with ES modules
 - Promise-based API
 - Type-safe interfaces
-- REST Level Client (RLC) architecture
+- Class-based client architecture
 
 ## Development
 
@@ -95,17 +93,15 @@ Features:
 To add support for additional languages, use the appropriate TypeSpec emitter:
 
 **Available TypeSpec Emitters:**
-- `@azure-tools/typespec-ts` - TypeScript
+- `@typespec/http-client-js` - TypeScript/JavaScript
 - `@typespec/http-client-python` - Python
-- `@azure-tools/typespec-go` - Go
-- `@azure-tools/typespec-java` - Java (via Autorest)
-- `@azure-tools/typespec-csharp` - C#
+- `@typespec/http-client-csharp` - C#
+- `@typespec/http-client-java` - Java
 
 1. Add the emitter as a dependency in `typespec/package.json`
-2. Add the emitter to `tspconfig.yaml` emit array
-3. Configure output options for the emitter
-4. Run `tsp compile` to generate the client
-5. Update this README with usage instructions
+2. Add the emitter to `tspconfig.yaml` emit array with appropriate options
+3. Run `tsp compile` to generate the client
+4. Update this README with usage instructions
 
 ## Contributing
 
