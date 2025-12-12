@@ -4,7 +4,7 @@ import "@typespec/rest";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 
-@service({title: "APIView Service"})
+@service(#{title: "APIView Service"})
 @server("https://apiview.dev", "APIView Service")
 namespace APIViewService;
 

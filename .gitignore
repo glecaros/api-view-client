@@ -6,6 +6,7 @@ node_modules/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+package-lock.json
 
 # Build outputs
 dist/
@@ -20,6 +21,7 @@ typespec-ts/
 # Generated client packages
 packages/*/dist/
 packages/*/build/
+packages/*/review/
 packages/*/.openapi-generator/FILES
 
 # IDE

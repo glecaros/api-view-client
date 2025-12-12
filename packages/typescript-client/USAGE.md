@@ -1,65 +1,89 @@
-# Example: Using the TypeScript Client
+# TypeScript Client Usage
+
+This TypeScript client is generated from TypeSpec using the `@azure-tools/typespec-ts` emitter.
 
 ## Installation
 
-First, build the client from the repository root:
+Build the client from the repository root:
 
 ```bash
 yarn install
 yarn generate:typescript
-yarn build
+cd packages/typescript-client
+npm install
+npm run build
 ```
 
 ## Basic Usage
 
 ```typescript
-import { Configuration, DefaultApi } from '@api-view/typescript-client';
+import APIViewServiceClient, { isUnexpected } from "@api-view/typescript-client";
 
-// Configure the API client
-const config = new Configuration({
-  basePath: 'https://apiview.dev',
-});
-
-const api = new DefaultApi(config);
+// Create the client
+const client = APIViewServiceClient("https://apiview.dev");
 
 // Upload a file for auto review
 async function uploadForReview() {
-  const file = new Blob(['/* your code content */'], { type: 'text/plain' });
+  const file = new File(['/* your code content */'], 'code.ts', { type: 'text/plain' });
   
-  try {
-    const response = await api.autoReviewUploadAutoReview({
-      apiKey: 'your-api-key-here',
-      uploadFormData: {
-        file: file,
-        label: 'v1.0.0',
-        packageVersion: '1.0.0'
-      }
-    });
-    
-    console.log('Upload response:', response.content);
-  } catch (error) {
-    console.error('Upload failed:', error);
+  const result = await client.path("/AutoReview/UploadAutoReview").post({
+    headers: {
+      "api-key": "your-api-key-here",
+    },
+    contentType: "multipart/form-data",
+    body: {
+      file: file,
+      label: "v1.0.0",
+      packageVersion: "1.0.0"
+    }
+  });
+  
+  if (isUnexpected(result)) {
+    throw new Error(`Upload failed: ${result.body.message}`);
   }
+  
+  console.log('Upload response:', result.body.content);
 }
 
-uploadForReview();
+uploadForReview().catch(console.error);
 ```
 
-## API Reference
+## API Structure
 
-### `autoReviewUploadAutoReview(request)`
+The generated client provides:
 
-Upload a source artifact for automatic review.
+- **REST Level Client (RLC)**: Low-level, path-based API
+- **Type Safety**: Full TypeScript types for requests and responses
+- **Multiple Module Formats**: ESM, CommonJS, Browser, React Native
 
-**Parameters:**
-- `apiKey` (string): API Key for authentication
-- `uploadFormData` (UploadFormData): Form data containing file and metadata
-  - `file` (Blob): The file to upload as binary data
-  - `label` (string): The API version label
-  - `packageVersion` (string): The package version
+## Models
 
-**Returns:**
-- Promise<UploadResponse>: Contains the response content from the upload operation
+### UploadFormData
+- `file: File` - The file to upload
+- `label: string` - The API version label
+- `packageVersion: string` - The package version
 
-**Throws:**
-- ErrorResponse: When the upload fails
+### UploadResponse
+- `content: string` - The response content from the upload operation
+
+### ErrorResponse
+- `message: string` - Error message
+- `code: number` - HTTP status code
+
+## Client Features
+
+- **Modern TypeScript**: Built with TypeScript 5.8+
+- **Multi-Platform**: Works in Node.js, browsers, and React Native
+- **Tree-Shakeable**: ES modules support for optimal bundle sizes
+- **Type Safe**: Complete TypeScript definitions
+
+## Building
+
+```bash
+npm run build
+```
+
+This will:
+1. Clean previous builds
+2. Build with `tshy` for multiple module formats
+3. Extract API documentation
