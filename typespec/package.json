@@ -1,0 +1,23 @@
+{
+  "name": "@api-view/typespec",
+  "version": "1.0.0",
+  "description": "TypeSpec definition for APIView Service",
+  "private": true,
+  "scripts": {
+    "generate": "tsp compile . --emit @typespec/openapi3",
+    "generate:typescript": "tsp compile . --emit @typespec/openapi3 && openapi-generator-cli generate -i tsp-output/@typespec/openapi3/openapi.yaml -g typescript-fetch -o ../packages/typescript-client --additional-properties=npmName=@api-view/typescript-client,supportsES6=true,npmVersion=1.0.0",
+    "clean": "rimraf tsp-output"
+  },
+  "dependencies": {
+    "@typespec/compiler": "^0.62.0",
+    "@typespec/http": "^0.62.0",
+    "@typespec/openapi": "^0.62.0",
+    "@typespec/openapi3": "^0.62.0",
+    "@typespec/rest": "^0.62.0",
+    "@typespec/versioning": "^0.62.0"
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.4",
+    "rimraf": "^5.0.5"
+  }
+}
