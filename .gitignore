@@ -17,6 +17,11 @@ build/
 tsp-output/
 typespec-ts/
 
+# Generated client packages
+packages/*/dist/
+packages/*/build/
+packages/*/.openapi-generator/FILES
+
 # IDE
 .vscode/
 .idea/
