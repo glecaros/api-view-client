@@ -1,47 +1,59 @@
 # Adding New Language Clients
 
-This guide explains how to add support for generating client libraries in additional programming languages.
+This guide explains how to add support for generating client libraries in additional programming languages using TypeSpec emitters.
 
 ## Overview
 
-The client generation process uses:
-1. **TypeSpec** - Define the API specification
-2. **OpenAPI Generator** - Generate clients from the OpenAPI spec
+The client generation process uses TypeSpec emitters to generate clients directly from the TypeSpec definition, without intermediate OpenAPI files.
+
+## Available TypeSpec Emitters
+
+- `@azure-tools/typespec-ts` - TypeScript (RLC)
+- `@typespec/http-client-python` - Python
+- `@azure-tools/typespec-go` - Go
+- `@azure-tools/typespec-java` - Java
+- `@azure-tools/typespec-csharp` - C#
+- `@azure-tools/typespec-rust` - Rust
 
 ## Steps to Add a New Language
 
-### 1. Choose a Generator
+### 1. Install the Emitter
 
-Browse available generators at: https://openapi-generator.tech/docs/generators
+Add the emitter package to `typespec/package.json`:
 
-Common generators:
-- `python` - Python client
-- `java` - Java client  
-- `csharp` - C# client
-- `go` - Go client
-- `ruby` - Ruby client
-- `php` - PHP client
-
-### 2. Add Generation Script
-
-Edit `typespec/package.json` and add a new script:
-
-```json
-{
-  "scripts": {
-    "generate:python": "tsp compile . --emit @typespec/openapi3 && openapi-generator-cli generate -i tsp-output/@typespec/openapi3/openapi.yaml -g python -o ../packages/python-client --additional-properties=packageName=apiview_client,projectName=apiview-client,packageVersion=1.0.0"
-  }
-}
+```bash
+cd typespec
+yarn add @typespec/http-client-python
 ```
 
-### 3. Add Root Script (Optional)
+### 2. Configure the Emitter
 
-For convenience, add a script in the root `package.json`:
+Edit `typespec/tspconfig.yaml` to add the emitter:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-ts"
+  - "@typespec/http-client-python"
+options:
+  "@azure-tools/typespec-ts":
+    packageDetails:
+      name: "@api-view/typescript-client"
+      version: "1.0.0"
+    emitterOutputDir: "{project-root}/../packages/typescript-client"
+  "@typespec/http-client-python":
+    package-name: "apiview-client"
+    package-version: "1.0.0"
+    emitterOutputDir: "{project-root}/../packages/python-client"
+```
+
+### 3. Add Generation Script (Optional)
+
+For convenience, add a script in `typespec/package.json`:
 
 ```json
 {
   "scripts": {
-    "generate:python": "yarn workspace @api-view/typespec generate:python"
+    "generate:python": "tsp compile . --emit @typespec/http-client-python"
   }
 }
 ```
@@ -49,7 +61,9 @@ For convenience, add a script in the root `package.json`:
 ### 4. Generate the Client
 
 ```bash
-yarn generate:python
+yarn workspace @api-view/typespec generate:python
+# or
+cd typespec && tsp compile . --emit @typespec/http-client-python
 ```
 
 ### 5. Test the Generated Client
@@ -63,84 +77,95 @@ cd packages/python-client
 
 ### 6. Update Documentation
 
-Add usage instructions to the main README.md and create a USAGE.md in the generated package directory.
+Add usage instructions to the main README.md.
 
-## Common Generator Options
+## Emitter Configuration Examples
 
-### TypeScript/JavaScript
-```bash
--g typescript-fetch \
---additional-properties=npmName=@api-view/typescript-client,supportsES6=true,npmVersion=1.0.0
+### TypeScript
+
+```yaml
+"@azure-tools/typespec-ts":
+  packageDetails:
+    name: "@api-view/typescript-client"
+    version: "1.0.0"
+  generateMetadata: true
+  generateTest: false
+  emitterOutputDir: "{project-root}/../packages/typescript-client"
 ```
 
 ### Python
-```bash
--g python \
---additional-properties=packageName=apiview_client,projectName=apiview-client,packageVersion=1.0.0
-```
 
-### Java
-```bash
--g java \
---additional-properties=groupId=dev.apiview,artifactId=apiview-client,apiPackage=dev.apiview.api,modelPackage=dev.apiview.model
-```
-
-### C#
-```bash
--g csharp \
---additional-properties=packageName=APIView.Client,targetFramework=net6.0
+```yaml
+"@typespec/http-client-python":
+  package-name: "apiview-client"
+  package-version: "1.0.0"
+  emitterOutputDir: "{project-root}/../packages/python-client"
 ```
 
 ### Go
-```bash
--g go \
---additional-properties=packageName=apiview,packageVersion=1.0.0
+
+```yaml
+"@azure-tools/typespec-go":
+  module: "github.com/yourorg/apiview-client"
+  packageDir: "{project-root}/../packages/go-client"
 ```
 
 ## Best Practices
 
 1. **Output Directory**: Generate to `packages/<language>-client/`
-2. **Package Naming**: Use consistent naming like `@api-view/<language>-client`
-3. **Documentation**: Create USAGE.md for each client with examples
+2. **Package Naming**: Use consistent naming conventions
+3. **Documentation**: Create usage examples for each client
 4. **Version**: Keep all clients at the same version as the TypeSpec
-5. **Testing**: Add build/test scripts to verify generated clients
+5. **Testing**: Verify generated clients build and work correctly
 
 ## Example: Adding Python Client
 
-1. Add to `typespec/package.json`:
-```json
-"generate:python": "tsp compile . --emit @typespec/openapi3 && openapi-generator-cli generate -i tsp-output/@typespec/openapi3/openapi.yaml -g python -o ../packages/python-client --additional-properties=packageName=apiview_client,projectName=apiview-client,packageVersion=1.0.0"
+1. Install the emitter:
+```bash
+cd typespec
+yarn add @typespec/http-client-python
 ```
 
-2. Generate:
-```bash
-yarn workspace @api-view/typespec generate:python
+2. Update `typespec/tspconfig.yaml`:
+```yaml
+emit:
+  - "@azure-tools/typespec-ts"
+  - "@typespec/http-client-python"
+options:
+  "@typespec/http-client-python":
+    package-name: "apiview-client"
+    package-version: "1.0.0"
+    emitterOutputDir: "{project-root}/../packages/python-client"
 ```
 
-3. Test:
+3. Generate:
 ```bash
-cd packages/python-client
+tsp compile . --emit @typespec/http-client-python
+```
+
+4. Test:
+```bash
+cd ../packages/python-client
 pip install -e .
 python -c "import apiview_client; print(apiview_client)"
 ```
 
-4. Document in `packages/python-client/USAGE.md`
-
 ## Troubleshooting
 
-### Generator Not Found
-- Ensure OpenAPI Generator CLI is installed: `yarn workspace @api-view/typespec add @openapitools/openapi-generator-cli`
+### Emitter Not Found
+- Ensure the emitter is installed: `yarn add <emitter-package>`
+- Check that it's listed in `typespec/package.json` dependencies
 
-### Invalid OpenAPI Spec
-- Verify TypeSpec compilation: `yarn generate`
-- Check the generated file: `typespec/tsp-output/@typespec/openapi3/openapi.yaml`
+### Compilation Errors
+- Verify TypeSpec compilation: `tsp compile .`
+- Check the emitter documentation for required TypeSpec features
 
 ### Build Failures
-- Check language-specific requirements
-- Review generator documentation: https://openapi-generator.tech/docs/generators/
+- Review language-specific requirements
+- Check emitter documentation for configuration options
 
 ## Resources
 
-- [OpenAPI Generator Generators](https://openapi-generator.tech/docs/generators)
 - [TypeSpec Documentation](https://typespec.io/)
-- [OpenAPI 3.0 Specification](https://swagger.io/specification/)
+- [Azure TypeSpec Emitters](https://github.com/Azure/autorest.typescript/tree/main/packages)
+- [TypeSpec HTTP Client Python](https://github.com/microsoft/typespec/tree/main/packages/http-client-python)

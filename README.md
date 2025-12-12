@@ -32,27 +32,17 @@ This will install Yarn Berry (v4.x) automatically and install all workspace depe
 
 ### Generate Client Libraries
 
-#### Generate OpenAPI Specification
-
-To generate the OpenAPI 3.0 specification from TypeSpec:
-
-```bash
-yarn generate
-```
-
-This will create the OpenAPI specification in `typespec/tsp-output/@typespec/openapi3/openapi.yaml`.
-
 #### Generate TypeScript Client
 
-To generate a TypeScript client library:
+To generate a TypeScript client library directly from TypeSpec:
 
 ```bash
 yarn generate:typescript
 ```
 
-This will:
-1. Generate the OpenAPI specification
-2. Use OpenAPI Generator to create a TypeScript client in `packages/typescript-client/`
+This uses the `@azure-tools/typespec-ts` emitter to generate a TypeScript client in `packages/typescript-client/`.
+
+**Note:** There's currently a known issue with the TypeSpec emitter where `contentType: contentType` is generated instead of `contentType: "multipart/form-data"` in the operations file. After generation, you'll need to manually fix this in `packages/typescript-client/src/api/autoReview/operations.ts` before building.
 
 ### Build All Packages
 
@@ -84,31 +74,38 @@ The API specification is defined in `typespec/main.tsp` and includes:
 
 Location: `packages/typescript-client/`
 
-The TypeScript client is generated using OpenAPI Generator with the `typescript-fetch` generator.
+The TypeScript client is generated directly from TypeSpec using the `@azure-tools/typespec-ts` emitter.
 
 Features:
 - ES6+ support
 - Promise-based API
 - Type-safe interfaces
-- Fetch API backend
+- REST Level Client (RLC) architecture
 
 ## Development
 
 ### Adding New Operations
 
 1. Edit `typespec/main.tsp` to add new models, operations, or interfaces
-2. Run `yarn generate` to regenerate the OpenAPI specification
-3. Run `yarn generate:typescript` (or other language-specific scripts) to regenerate clients
-4. Test the generated clients
+2. Run `yarn generate:typescript` to regenerate the TypeScript client
+3. Test the generated client
 
 ### Adding Support for More Languages
 
-To add support for additional languages:
+To add support for additional languages, use the appropriate TypeSpec emitter:
 
-1. Add a new script in `typespec/package.json` (e.g., `generate:python`)
-2. Use OpenAPI Generator with the appropriate generator (e.g., `python`)
-3. Output to `packages/<language>-client/`
-4. Update this README with usage instructions
+**Available TypeSpec Emitters:**
+- `@azure-tools/typespec-ts` - TypeScript
+- `@typespec/http-client-python` - Python
+- `@azure-tools/typespec-go` - Go
+- `@azure-tools/typespec-java` - Java (via Autorest)
+- `@azure-tools/typespec-csharp` - C#
+
+1. Add the emitter as a dependency in `typespec/package.json`
+2. Add the emitter to `tspconfig.yaml` emit array
+3. Configure output options for the emitter
+4. Run `tsp compile` to generate the client
+5. Update this README with usage instructions
 
 ## Contributing
 

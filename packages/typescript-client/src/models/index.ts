@@ -1,5 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
-export * from './ErrorResponse';
-export * from './UploadFormData';
-export * from './UploadResponse';
+// Licensed under the MIT License.
+
+export { UploadFormData, UploadResponse, ErrorResponse } from "./models.js";
