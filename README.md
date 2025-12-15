@@ -2,6 +2,8 @@
 
 This monorepo contains the TypeSpec definition for the APIView Service and generates client libraries for multiple languages.
 
+For development environment setup and contributing guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Repository Structure
 
 ```
