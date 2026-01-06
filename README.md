@@ -1,37 +1,119 @@
 # API View Clients
 
-This repository contains client libraries generated from TypeSpec specifications. The generated clients are available for TypeScript and C#.
+This monorepo contains the TypeSpec definition for the APIView Service and generates client libraries for multiple languages.
+
+For development environment setup and contributing guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Repository Structure
+
+```
+.
+├── typespec/              # TypeSpec API definition
+│   ├── main.tsp          # Main TypeSpec file
+│   ├── tspconfig.yaml    # TypeSpec configuration
+│   └── package.json      # TypeSpec dependencies
+├── packages/             # Generated client libraries
+│   └── typescript-client/  # TypeScript client (generated)
+└── package.json          # Root workspace configuration
+```
+
+## Prerequisites
+
+- Node.js 18.x or later
+- Yarn 4.x (configured via packageManager in package.json)
+
+## Getting Started
+
+### Install Dependencies
+
+```bash
+yarn install
+```
+
+This will install Yarn Berry (v4.x) automatically and install all workspace dependencies.
+
+### Generate Client Libraries
+
+#### Generate TypeScript Client
+
+To generate a TypeScript client library directly from TypeSpec:
+
+```bash
+yarn generate:typescript
+```
+
+This uses the `@typespec/http-client-js` emitter to generate a TypeScript client in `packages/typescript-client/`.
+
+### Build All Packages
+
+```bash
+yarn build
+```
+
+### Clean Generated Files
+
+```bash
+yarn clean
+```
+
+## TypeSpec Definition
+
+The API specification is defined in `typespec/main.tsp` and includes:
+
+- **AutoReview Interface**: Upload operations for automatic code review
+- **UploadAutoReview Operation**: Multipart form upload with API key authentication
+
+### Service Details
+
+- **Base URL**: `https://apiview.dev`
+- **Service Title**: APIView Service
+
+## Generated Client Libraries
+
+### TypeScript Client
+
+Location: `packages/typescript-client/`
+
+The TypeScript client is generated directly from TypeSpec using the `@typespec/http-client-js` emitter.
+
+Features:
+- Modern TypeScript with ES modules
+- Promise-based API
+- Type-safe interfaces
+- Class-based client architecture
 
 ## Development
 
-This repository is configured with a development container that provides all necessary tools for TypeScript and C# development, including:
+### Adding New Operations
 
-- Node.js 22 for TypeScript development
-- .NET 8.0 SDK for C# development
-- TypeSpec compiler for API specification work
-- All required VS Code extensions and tooling
+1. Edit `typespec/main.tsp` to add new models, operations, or interfaces
+2. Run `yarn generate:typescript` to regenerate the TypeScript client
+3. Test the generated client
 
-### Getting Started
+### Adding Support for More Languages
 
-To start contributing, please see our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on:
+To add support for additional languages, use the appropriate TypeSpec emitter:
 
-- Setting up the development environment with Dev Containers
-- Development workflows for TypeScript and C#
-- Code quality standards
-- Submitting changes
+**Available TypeSpec Emitters:**
+- `@typespec/http-client-js` - TypeScript/JavaScript
+- `@typespec/http-client-python` - Python
+- `@typespec/http-client-csharp` - C#
+- `@typespec/http-client-java` - Java
 
-## Quick Start
-
-1. Install [Docker](https://www.docker.com/products/docker-desktop) and [VS Code](https://code.visualstudio.com/)
-2. Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-3. Clone this repository and open it in VS Code
-4. Click "Reopen in Container" when prompted
-5. Start developing!
+1. Add the emitter as a dependency in `typespec/package.json`
+2. Add the emitter to `tspconfig.yaml` emit array with appropriate options
+3. Run `tsp compile` to generate the client
+4. Update this README with usage instructions
 
 ## Contributing
 
-We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
+When contributing to this repository:
+
+1. Do not manually edit files in `packages/` - they are generated
+2. Make changes to `typespec/main.tsp` instead
+3. Regenerate clients after making changes
+4. Ensure all generated clients build successfully
 
 ## License
 
-[Add License Information]
+MIT

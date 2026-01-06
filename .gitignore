@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+package-lock.json
+
+# Build outputs
+dist/
+build/
+*.tgz
+*.log
+
+# TypeSpec outputs
+tsp-output/
+typespec-ts/
+
+# Generated client packages
+packages/*/dist/
+packages/*/build/
+packages/*/review/
+packages/*/.openapi-generator/FILES
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Environment
+.env
+.env.local

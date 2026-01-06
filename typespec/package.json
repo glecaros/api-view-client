@@ -1,0 +1,19 @@
+{
+  "name": "@api-view/typespec",
+  "version": "1.0.0",
+  "description": "TypeSpec definition for APIView Service",
+  "private": true,
+  "scripts": {
+    "generate:typescript": "tsp compile . && mkdir -p ../packages && rm -rf ../packages/typescript-client && mv tsp-output/@typespec/http-client-js ../packages/typescript-client",
+    "clean": "rimraf tsp-output ../packages/typescript-client"
+  },
+  "dependencies": {
+    "@typespec/compiler": "^1.7.0",
+    "@typespec/http": "^1.7.0",
+    "@typespec/http-client-js": "^0.12.0",
+    "@typespec/rest": "^0.77.0"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.5"
+  }
+}
